@@ -1,0 +1,82 @@
+﻿@model IEnumerable<EmployeesApi.Employees.Dto.EmployeeDto>
+
+@{
+    ViewData["Title"] = "GetAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Employees</h2>
+
+<p>
+    <a href="Employee/Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PersonalNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BirthDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nationality)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SalaryAmount)
+            </th>
+            <th>
+                Salary Currency
+            </th>
+            <th>
+                Phone Numbers
+            </th>
+            <th>
+                Edit
+            </th>
+            @*<th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>*@
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    var dateString = @item.BirthDate.ToString("yyyy-MM-dd");
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PersonalNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => @dateString)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nationality)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SalaryAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SalaryCurrencyCode)
+            </td>
+            <td>
+                @string.Join(",", item.PhoneNumbers.Select(x=> x.CountryCode + " " + x.Number))
+            </td>
+            <td>
+             <a href="/Employee/Edit?EmployeeId=@item.Id">Edit</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

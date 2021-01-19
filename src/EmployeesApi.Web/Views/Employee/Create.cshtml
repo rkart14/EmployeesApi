@@ -1,0 +1,121 @@
+﻿@model EmployeesApi.Web.ViewModels.LookupInfo
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create</h2>
+<hr />
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">FirstName</label>
+                <input type="text" class="form-control" id="firstName" placeholder="FirstName" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">LastName</label>
+                <input type="text" class="form-control" id="lastName" placeholder="LastName"/>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Personal Number</label>
+                <input type="text" class="form-control" id="personalNumber" placeholder="Personal Number"/>
+            </div>
+            <div class="form-group">
+                <label class="control-label">BirthDate</label>
+                <input type="date" class="form-control" id="birthDate" placeholder="Birth Date"/>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Nationality</label>
+                <select class="form-control" id="nationality">
+                    @foreach (var nationality in Model.Nationalities)
+                    {
+                        <option value="@nationality.Id">@nationality.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Salary Amount</label>
+                <input type="number" class="form-control" id="salaryAmount" placeholder="Salary Amount" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Salary Currency</label>
+                <select class="form-control" id="salaryCurrencyId">
+                    <option></option>
+                    @foreach (var code in Model.Currencies)
+                    {
+
+                        <option value="@code.Id">@code.Code</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Phone Number</label>
+                <div class="form-inline">
+                    <select class="form-control" id="countryCodesSelect">
+                        <option></option>
+                        @foreach (var code in Model.CountryCodes)
+                        {
+                            <option value="@code.Id">@code.Code</option>
+                        }
+                    </select>
+                    <input type="tel" class="form-control" id="phoneNumber"  placeholder="Phone Number" />
+                </div>
+            </div>
+            <div class="form-group">
+                <input onclick="EditEmployeeInfo()" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a href="/Home/index">Back to List</a>
+</div>
+<script>
+    function EditEmployeeInfo() {
+        var firstName = $("#firstName").val();
+        var lastName = $("#lastName").val();
+        var personalNumber = $("#personalNumber").val();
+        var birthDate = $("#birthDate").val();
+        var nationalityId = $("#nationality option:selected").val();
+        var salaryAmount = $("#salaryAmount").val();
+        var salaryCurrencyId = $("#salaryCurrencyId option:selected").val();
+        var countryCodeId = $("#countryCodesSelect option:selected").val();
+        var phoneNumber = $("#phoneNumber").val();
+        var numberObj = {
+            "CountryCodeId": countryCodeId,
+            "Number": phoneNumber
+        };
+        var numbersArr = [];
+        if (countryCodeId != "" || phoneNumber != "") {
+            numbersArr.push(numberObj);
+        }
+        var dataToSend =
+        {
+            "FirstName": firstName,
+            "LastName": lastName,
+            "PersonalNumber": personalNumber,
+            "birthDate": birthDate,
+            "NationalityId": nationalityId,
+            "salaryAmount": salaryAmount,
+            "SalaryCurrencyId": salaryCurrencyId,
+            "PhoneNumbers": numbersArr
+        };
+        $.ajax({
+            url: "/Employee/Create",
+            data: dataToSend,
+            method: "Post",
+            success: function () {
+                alert("Successfully Added!");
+            },
+            error: function (data) {
+                alert(data.responseJSON.error.message);
+            }
+        });
+    }
+</script>

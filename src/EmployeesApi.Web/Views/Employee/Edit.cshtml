@@ -1,0 +1,159 @@
+﻿@model EmployeesApi.Web.ViewModels.EditEmployeeViewModel;
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit</h2>
+<hr />
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group"  id="employeeId" data-id="@Model.Employee.Id">
+                <label class="control-label">FirstName</label>
+                <input type="text" class="form-control" value="@Model.Employee.FirstName" id="firstName" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">LastName</label>
+                <input type="text" class="form-control" value="@Model.Employee.LastName" id="lastName" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Personal Number</label>
+                <input type="text" class="form-control" value="@Model.Employee.PersonalNumber" id="personalNumber" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">BirthDate</label>
+                <input type="date" class="form-control" value="@Model.Employee.BirthDate.ToString("yyyy-MM-dd")" id="birthDate"/>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Nationality</label>
+                <select class="form-control" id="nationality">
+                    <option>No Info</option>
+                    @foreach (var nationality in Model.LookUpInfo.Nationalities)
+                    {
+                        if (nationality.Name == Model.Employee.Nationality)
+                        {
+                            <option value="@nationality.Id" selected>@nationality.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@nationality.Id">@nationality.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Salary Amount</label>
+                <input type="number" class="form-control" value="@Model.Employee.SalaryAmount" id="salaryAmount"/>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Salary Currency</label>
+                <select class="form-control" id="salaryCurrencyId">
+                    <option></option>
+                    @foreach (var code in Model.LookUpInfo.Currencies)
+                    {
+                        if (code.Code == Model.Employee.SalaryCurrencyCode)
+                        {
+                            <option value="@code.Id" selected>@code.Code</option>
+                        }
+                        else
+                        {
+                            <option value="@code.Id">@code.Code</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Phone Numbers</label>
+                @foreach (var number in Model.Employee.PhoneNumbers) { 
+                <div class="form-inline">
+                    <select class="form-control" id="select_@number.Id">
+                        @foreach (var code in Model.LookUpInfo.CountryCodes)
+                        {
+                            if (code.Id == number.CountryCodeId)
+                            {
+                                <option value="@code.Id" selected>@code.Code</option>
+                            }
+                            else
+                            {
+                                <option value="@code.Id">@code.Code</option>
+                            }
+                        }
+                    </select>
+                    <input type="tel" class="form-control" value="@number.Number" id="number_@number.Id" placeholder="Phone Number"/>
+                    <input onclick="changePhoneNumber(@number.Id)" value="Change" class="btn btn-default">
+                </div>
+                }
+            </div>
+            <div class="form-group">
+                <input onclick="EditEmployeeInfo()" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a href="/Home/index">Back to List</a>
+</div>
+<script>
+    function EditEmployeeInfo() {
+        var firstName = $("#firstName").val();
+        var lastName = $("#lastName").val();
+        var personalNumber = $("#personalNumber").val();
+        var birthDate = $("#birthDate").val();
+        var nationalityId = $("#nationality option:selected").val();
+        var salaryAmount = $("#salaryAmount").val();
+        var salaryCurrencyId = $("#salaryCurrencyId").val();
+        var employeeId = $("#employeeId").attr("data-id");
+        var dataToSend =
+        {
+            "EmployeeId": employeeId,
+            "FirstName": firstName,
+            "LastName": lastName,
+            "PersonalNumber": personalNumber,
+            "birthDate": birthDate,
+            "NationalityId": nationalityId,
+            "salaryAmount": salaryAmount,
+            "SalaryCurrencyId": salaryCurrencyId
+        };
+        $.ajax({
+            url: "/Employee/Edit",
+            data: dataToSend,
+            method: "Post",
+            success: function () {
+                alert("Successfully Changed!");
+            },
+            error: function (data) {
+                alert(data.responseJSON.error.message);
+            }
+        });
+    }
+
+    function changePhoneNumber(numberId) {
+        var newNumber = $("#number_" + numberId).val();
+        var newCountryCodeId = $("#select_" + numberId + " option:selected").val();
+        var employeeId = $("#employeeId").attr("data-id");
+        var dataToSend = {
+            "Number": newNumber,
+            "CountryCodeId": newCountryCodeId,
+            "NumberId": numberId,
+            "EmployeeId": employeeId
+        };
+        $.ajax({
+            url: "/Employee/EditNumber",
+            data: dataToSend,
+            method: "Post",
+            success: function () {
+                alert("Successfully Changed!");
+            },
+            error: function (data) {
+                alert(data.responseJSON.error.message);
+            }
+        });
+    }
+</script>
